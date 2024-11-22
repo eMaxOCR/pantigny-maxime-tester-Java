@@ -111,4 +111,29 @@ public class TicketDAO {
 		return nbSameReg; //Return the amount of same reg number.
     	
     }
+    
+    public Integer getRegAlreadyPark(String vehicleRegNumber) {
+    	Connection con = null;
+    	int nbSameReg = 0;
+        try {
+        	con = dataBaseConfig.getConnection(); //Set connection to the database
+            PreparedStatement ps = con.prepareStatement(DBConstants.GET_NUMBER_VEHICLE_REG_ALREADY_PARK); //Count how many they are same reg number.
+            
+            ps.setString(1,vehicleRegNumber); //Checking 
+            ResultSet rs = ps.executeQuery();
+            
+            if (rs.next()) { //??
+            	nbSameReg = rs.getInt(1);
+            }
+            
+            dataBaseConfig.closeResultSet(rs); //Closing ResultSet
+            dataBaseConfig.closePreparedStatement(ps); //Closing PreparedStatement
+        }catch (Exception ex){
+            logger.error("Error counting vehicle reg",ex);
+        }finally {
+            dataBaseConfig.closeConnection(con); //Close connection.
+        }
+		return nbSameReg; //Return the amount of same reg number.
+    	
+    }
 }
