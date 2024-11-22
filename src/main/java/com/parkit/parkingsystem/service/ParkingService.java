@@ -111,6 +111,7 @@ public class ParkingService {
             Ticket ticket = ticketDAO.getTicket(vehicleRegNumber);
             Date outTime = new Date();
             ticket.setOutTime(outTime);
+            
             DecimalFormat df = new DecimalFormat("#.##");
             String prixTicket;
             
