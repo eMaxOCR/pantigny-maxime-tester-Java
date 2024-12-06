@@ -1,13 +1,16 @@
 package com.parkit.parkingsystem.model;
 
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Objects;
 
 public class Ticket {
     private int id;
     private ParkingSpot parkingSpot;
     private String vehicleRegNumber;
-    private double price;
+    private BigDecimal price;
     private Date inTime;
     private Date outTime;
     
@@ -35,11 +38,11 @@ public class Ticket {
         this.vehicleRegNumber = vehicleRegNumber;
     }
 
-    public double getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
     }
 
@@ -54,8 +57,16 @@ public class Ticket {
     public Date getOutTime() {
         return outTime;
     }
+    
     public void setOutTime(Date outTime) {
         this.outTime = outTime;
+    }
+    
+    @Override
+    public String toString() {
+    	DecimalFormat df = new DecimalFormat("#.##");
+    	return df.format(price);
+    	
     }
 
 }

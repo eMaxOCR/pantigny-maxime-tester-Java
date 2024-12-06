@@ -9,6 +9,7 @@ import com.parkit.parkingsystem.util.InputReaderUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.Date;
 
@@ -31,7 +32,7 @@ public class ParkingService {
     public void processIncomingVehicle() {
         try{
             ParkingSpot parkingSpot = getNextParkingNumberIfAvailable();
-            if(parkingSpot !=null && parkingSpot.getId() > 0){
+            if(parkingSpot != null && parkingSpot.getId() > 0){
                 String vehicleRegNumber = getVehichleRegNumber();
                 if(ticketDAO.getRegAlreadyPark(vehicleRegNumber)>0) {//Check if any vehicle having the same REG is already park.
                 	System.out.println("Erreur système : La plaque d'immatriculation renseignée est déjà garée.");
@@ -45,7 +46,7 @@ public class ParkingService {
 	                //ticket.setId(ticketID);
 	                ticket.setParkingSpot(parkingSpot);
 	                ticket.setVehicleRegNumber(vehicleRegNumber);
-	                ticket.setPrice(0);
+	                ticket.setPrice(BigDecimal.ZERO);
 	                ticket.setInTime(inTime);
 	                ticket.setOutTime(null);
 	                ticketDAO.saveTicket(ticket);
@@ -116,28 +117,24 @@ public class ParkingService {
             Date outTime = new Date();
             ticket.setOutTime(outTime);
             
-            DecimalFormat df = new DecimalFormat("#.##");
-            String prixTicket;
-            
        
-            int nbSameReg;
-            nbSameReg = ticketDAO.getNbTicket(vehicleRegNumber);
-            Boolean applyReduce = false;
+            int nbSameReg = ticketDAO.getNbTicket(vehicleRegNumber);
+            Boolean applyDiscount = false;
             
             if(nbSameReg>1) {
-            	applyReduce = true;
+            	applyDiscount = true;
             }
             
-            fareCalculatorService.calculateFare(ticket,applyReduce);
+            fareCalculatorService.calculateFare(ticket,applyDiscount);
             if(ticketDAO.updateTicket(ticket)) {
                 ParkingSpot parkingSpot = ticket.getParkingSpot();
                 parkingSpot.setAvailable(true);
                 parkingSpotDAO.updateParking(parkingSpot);
-                if(applyReduce & ticket.getPrice()>0) {
+                if(applyDiscount && ticket.getPrice().compareTo(BigDecimal.ZERO)>0) {
                 	System.out.println("Special 5% reduction has been applied");
                 }
-                prixTicket = df.format(ticket.getPrice());
-                System.out.println("Please pay the parking fare: " + prixTicket + "€.");
+               
+                System.out.println("Please pay the parking fare: " + ticket + "€.");
                 System.out.println("Recorded out-time for vehicle number:" + ticket.getVehicleRegNumber() + " is:" + outTime);
             }else{
                 System.out.println("Unable to update ticket information. Error occurred");

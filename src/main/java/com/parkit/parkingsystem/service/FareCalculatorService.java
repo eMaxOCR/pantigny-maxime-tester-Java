@@ -1,5 +1,7 @@
 package com.parkit.parkingsystem.service;
 
+import java.math.BigDecimal;
+
 import com.parkit.parkingsystem.constants.Fare;
 import com.parkit.parkingsystem.model.Ticket;
 
@@ -30,16 +32,16 @@ public class FareCalculatorService {
         
         //If duration is less or equal than 30 minutes, ticket is free
         if(duration <= freeTime){
-        	ticket.setPrice(0);
+        	ticket.setPrice(BigDecimal.ZERO);
      
         }else {
 	        switch (ticket.getParkingSpot().getParkingType()){
 	            case CAR: {
-	                ticket.setPrice((duration * (Fare.CAR_RATE_PER_HOUR * discountMultiplicator)) / msInAnHour);
+	                ticket.setPrice(new BigDecimal((duration * (Fare.CAR_RATE_PER_HOUR * discountMultiplicator)) / msInAnHour));
 	                break;
 	            }
 	            case BIKE: {
-	                ticket.setPrice((duration * (Fare.BIKE_RATE_PER_HOUR * discountMultiplicator)) / msInAnHour);
+	                ticket.setPrice(new BigDecimal((duration * (Fare.BIKE_RATE_PER_HOUR * discountMultiplicator)) / msInAnHour));
 	                break;
 	            }
 	            default: throw new IllegalArgumentException("Unkown Parking Type");
