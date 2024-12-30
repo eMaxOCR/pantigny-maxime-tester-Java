@@ -8,6 +8,7 @@ import com.parkit.parkingsystem.model.Ticket;
 import com.parkit.parkingsystem.service.ParkingService;
 import com.parkit.parkingsystem.util.InputReaderUtil;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -15,7 +16,10 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Date;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
+
 
 @ExtendWith(MockitoExtension.class)
 public class ParkingServiceTest {
@@ -28,19 +32,17 @@ public class ParkingServiceTest {
     private static ParkingSpotDAO parkingSpotDAO;
     @Mock
     private static TicketDAO ticketDAO;
-  
+
     private Ticket ticket;
 
     @BeforeEach
     private void setUpPerTest() {
         try {
-        	
             ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR,true);
             ticket = new Ticket();
             ticket.setInTime(new Date(System.currentTimeMillis() - (60*60*1000)));
             ticket.setParkingSpot(parkingSpot);
             ticket.setVehicleRegNumber("ABCDEF");
-           
                      
             parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
         } catch (Exception e) {
@@ -51,7 +53,6 @@ public class ParkingServiceTest {
     
     @Test
     public void processIncomingVehicleTest() {
-    	
     	//GIVEN
     	when(inputReaderUtil.readSelection()).thenReturn(1);//set Car
     	when(parkingSpotDAO.getNextAvailableSlot(any(ParkingType.class))).thenReturn(1);//set parkingNumber to 1 to simulate availability
@@ -74,7 +75,6 @@ public class ParkingServiceTest {
     	when(ticketDAO.getNbTicket("ABCDEF")).thenReturn(1);
     	when(ticketDAO.updateTicket(any(Ticket.class))).thenReturn(true);
     	when(parkingSpotDAO.updateParking(any(ParkingSpot.class))).thenReturn(true);
-    	
     	
     	//WHEN
         parkingService.processExitingVehicle();
@@ -156,6 +156,7 @@ public class ParkingServiceTest {
     	
     	//THEN
     	assertEquals(null, parkingSpot);														//Check if parkingSpot is null
+    	
     }
 
 }

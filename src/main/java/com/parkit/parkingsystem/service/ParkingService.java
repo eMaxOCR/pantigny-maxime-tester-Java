@@ -11,6 +11,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 public class ParkingService {
@@ -22,11 +23,15 @@ public class ParkingService {
     private InputReaderUtil inputReaderUtil;
     private ParkingSpotDAO parkingSpotDAO;
     private TicketDAO ticketDAO;
+    private Calendar calendar;
+    private int minute;
+    
 
-    public ParkingService(InputReaderUtil inputReaderUtil, ParkingSpotDAO parkingSpotDAO, TicketDAO ticketDAO){
+	public ParkingService(InputReaderUtil inputReaderUtil, ParkingSpotDAO parkingSpotDAO, TicketDAO ticketDAO){
         this.inputReaderUtil = inputReaderUtil;
         this.parkingSpotDAO = parkingSpotDAO;
         this.ticketDAO = ticketDAO;
+        this.minute = 0;
     }
 
     public void processIncomingVehicle() {
@@ -39,8 +44,10 @@ public class ParkingService {
                 }else {
 	                parkingSpot.setAvailable(false);
 	                parkingSpotDAO.updateParking(parkingSpot);//allot this parking space and mark it's availability as false
-	
-	                Date inTime = new Date();
+	                
+	                calendar = Calendar.getInstance(); //Initialize calendar with time.
+	                calendar.add(Calendar.MINUTE,minute); //Adding offset.
+	                Date inTime = calendar.getTime(); //Getting time from calendar.
 	                Ticket ticket = new Ticket();
 	                //ID, PARKING_NUMBER, VEHICLE_REG_NUMBER, PRICE, IN_TIME, OUT_TIME)
 	                //ticket.setId(ticketID);
@@ -114,7 +121,12 @@ public class ParkingService {
         try{
             String vehicleRegNumber = getVehichleRegNumber();
             Ticket ticket = ticketDAO.getTicket(vehicleRegNumber);
-            Date outTime = new Date();
+            
+            
+            calendar = Calendar.getInstance(); //Initialize calendar with time.
+            calendar.add(Calendar.MINUTE,minute); //Adding offset.
+            Date outTime = calendar.getTime();//Getting time from calendar.
+            
             ticket.setOutTime(outTime);
             
        
@@ -143,4 +155,20 @@ public class ParkingService {
             logger.error("Unable to process exiting vehicle",e);
         }
     }
+
+	public Calendar getCalendar() {
+		return calendar;
+	}
+
+	public void setCalendar(Calendar calendar) {
+		this.calendar = calendar;
+	}
+	
+    public int getMinute() {
+		return minute;
+	}
+
+	public void setMinute(int minute) {
+		this.minute = minute;
+	}
 }
